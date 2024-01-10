@@ -3,7 +3,7 @@
 
 This is a Dialog script where you can talk to specific peds you spawn in config or in other scripts. <br>
 
-Works on: <br>
+Works with: <br>
 Qb-target <br>
 ox-target <br>
 
