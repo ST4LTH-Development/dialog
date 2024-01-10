@@ -13,12 +13,12 @@ local loadModel = function(modelHash)
 end
 
 local getClosestPed = function(coords, max)
-	local peds = GetGamePool('CPed')
+	local all = GetGamePool('CPed')
 	local closest, closestCoords
 	max = max or 2.0
 
-	for i = 1, #peds do
-		local ped = peds[i]
+	for i = 1, #all do
+		local ped = all[i]
 
         if IsPedAPlayer(ped) then
             return
@@ -61,74 +61,12 @@ end
 
 SpawnPeds = function()
     for v, k in pairs(Config.peds) do
-        local ped, pedDist = getClosestPed(k.coords)
-        if k.dict then
-            dict = k.dict
-        else
-            dict = "missbigscore2aig_6"
-        end
-
-        if k.lib then
-            lib = k.lib
-        else
-            lib = "wait_loop"
-        end
-
-        if DoesEntityExist(ped) and pedDist <= 1.2 then
-            DeletePed(ped)
-        end
-
-        loadModel(k.model)
-
-        ped = CreatePed(5, GetHashKey(k.model), k.coords.x, k.coords.y, k.coords.z - 1.0, k.heading, false, false)
-
-        SetEntityHeading(ped, k.heading)
-
-        SetPedCombatAttributes(ped, 46, true)                     
-        SetPedFleeAttributes(ped, 0, 0)               
-        SetBlockingOfNonTemporaryEvents(ped, true)
-        
-        SetEntityAsMissionEntity(ped, true, true)
-        FreezeEntityPosition(ped, true)
-        SetEntityInvincible(ped, true)
-        SetPedDiesWhenInjured(ped, false)
-        SetPedHearingRange(ped, 1.0)
-        SetPedAlertness(ped, 0)
-
-        if k.type ~= 'scenario' then
-            playAnimation({
-                ped = ped,
-                dict = dict,
-                lib = lib,
-                flag = 1
-            })
-        else
-            TaskStartScenarioInPlace(ped, k.anim, 0, false)
-        end
-
-        opts = {
-            label = k.label,
-            icon = k.icon,
-            action = function()
-                if k.data then
-                    OpenDialog(ped, k.data)
-                else 
-                    if k.server then
-                        TriggerServerEvent(k.event, ped)
-                    else
-                        TriggerEvent(k.event, ped)
-                    end
-                end
-            end
-        }
-        exports['qb-target']:AddTargetEntity(ped, {
-            options = { opts },
-            distance = 2.0
-        })
+        Peds[v] = k
+        SpawnPed(v, k)
     end
 end
 
-SpawnPed = function(data)
+SpawnPed = function(id, data)
     local ped, pedDist = getClosestPed(data.coords)
     if data.dict then
         dict = data.dict
@@ -148,30 +86,30 @@ SpawnPed = function(data)
 
     loadModel(data.model)
 
-    ped = CreatePed(5, GetHashdataey(data.model), data.coords.x, data.coords.y, data.coords.z - 1.0, data.heading, false, false)
+    Peds[id].ped = CreatePed(5, GetHashKey(data.model), data.coords.x, data.coords.y, data.coords.z - 1.0, data.heading, false, false)
 
-    SetEntityHeading(ped, data.heading)
+    SetEntityHeading(Peds[id].ped, data.heading)
 
-    SetPedCombatAttributes(ped, 46, true)                     
-    SetPedFleeAttributes(ped, 0, 0)               
-    SetBlockingOfNonTemporaryEvents(ped, true)
+    SetPedCombatAttributes(Peds[id].ped, 46, true)                     
+    SetPedFleeAttributes(Peds[id].ped, 0, 0)               
+    SetBlockingOfNonTemporaryEvents(Peds[id].ped, true)
     
-    SetEntityAsMissionEntity(ped, true, true)
-    FreezeEntityPosition(ped, true)
-    SetEntityInvincible(ped, true)
-    SetPedDiesWhenInjured(ped, false)
-    SetPedHearingRange(ped, 1.0)
-    SetPedAlertness(ped, 0)
+    SetEntityAsMissionEntity(Peds[id].ped, true, true)
+    FreezeEntityPosition(Peds[id].ped, true)
+    SetEntityInvincible(Peds[id].ped, true)
+    SetPedDiesWhenInjured(Peds[id].ped, false)
+    SetPedHearingRange(Peds[id].ped, 1.0)
+    SetPedAlertness(Peds[id].ped, 0)
 
     if data.type ~= 'scenario' then
         playAnimation({
-            ped = ped,
+            ped = Peds[id].ped,
             dict = dict,
             lib = lib,
             flag = 1
         })
     else
-        TaskStartScenarioInPlace(ped, data.anim, 0, false)
+        TaskStartScenarioInPlace(Peds[id].ped, data.anim, 0, false)
     end
 
     opts = {
@@ -179,17 +117,17 @@ SpawnPed = function(data)
         icon = data.icon,
         action = function()
             if data.data then
-                OpenDialog(ped, data.data)
+                OpenDialog(Peds[id].ped, data.data)
             else 
                 if data.server then
-                    TriggerServerEvent(data.event, ped)
+                    TriggerServerEvent(data.event, Peds[id].ped)
                 else
-                    TriggerEvent(data.event, ped)
+                    TriggerEvent(data.event, Peds[id].ped)
                 end
             end
         end
     }
-    exports['qb-target']:AddTargetEntity(ped, {
+    exports['qb-target']:AddTargetEntity(Peds[id].ped, {
         options = { opts },
         distance = 2.0
     })

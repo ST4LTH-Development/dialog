@@ -1,4 +1,5 @@
 Open = false
+Peds = {}
 
 RegisterNetEvent(Config.FrameworkLoadinEvent, function()
     SpawnPeds()
@@ -42,8 +43,17 @@ CloseDialog = function()
     })
 end
 
-SpawnPed = function(id, data) 
-    SpawnPed(data)
+SpawnPedByID = function(id, data) 
+    Peds[id] = data
+    SpawnPed(id, data)
+end
+
+DeletePedByID = function(id) 
+    if Peds[id].ped then
+        exports['qb-target']:RemoveTargetEntity(Peds[id].ped)
+        DeleteEntity(Peds[id].ped)
+        Peds[id] = nil
+    end
 end
 
 RegisterNUICallback('click', function(data, cb)
@@ -71,4 +81,4 @@ end)
 exports('OpenDialog', OpenDialog)
 exports('SetDialog', SetDialog)
 exports('CloseDialog', CloseDialog)
-exports('SpawnPed', SpawnPed)
+exports('SpawnPed', SpawnPedByID)

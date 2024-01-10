@@ -30,7 +30,7 @@ Config = {
                     },
                 }
             }
-        },
+        }, ]]
         ['test2'] = {
             label = 'Talk to the Mechanic',
             icon = 'fa-solid fa-comment',
@@ -38,6 +38,6 @@ Config = {
             coords = vector3(164.09, 6614.43, 31.92),
             heading = 90,
             event = 'con:mechanic'
-        }, ]]
+        },
     }
 }
