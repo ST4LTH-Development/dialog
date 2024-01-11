@@ -136,6 +136,6 @@ end
 SetInvisible = function()
     while Open do
         SetEntityLocallyInvisible(PlayerPedId())
-        Wait(10)
+        Wait(7)
     end
 end
