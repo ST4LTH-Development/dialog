@@ -77,7 +77,7 @@ RegisterNUICallback('click', function(data, cb)
         local args = data.args or {} 
         TriggerEvent(data.event, args)
     end
-
+end)
 exports('OpenDialog', OpenDialog)
 exports('SetDialog', SetDialog)
 exports('CloseDialog', CloseDialog)
