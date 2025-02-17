@@ -74,8 +74,13 @@ RegisterNUICallback('click', function(data, cb)
     end
 
     if data.event then
-        local args = data.args or {} 
-        TriggerEvent(data.event, args)
+        local args = data.args or {}
+
+        if data.server then
+            TriggerServerEvent(data.event, args)
+        else
+            TriggerEvent(data.event, args)
+        end
     end
 end)
 exports('OpenDialog', OpenDialog)
