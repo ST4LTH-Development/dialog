@@ -1,6 +1,7 @@
 Open = false
 cam = nil
 Peds = {}
+local Actions = {}
 
 if Config.FrameworkLoadinEvent ~= '' then
     RegisterNetEvent(Config.FrameworkLoadinEvent, function()
@@ -40,6 +41,20 @@ OpenDialog = function(ped, data, zoom, x, y, z, rotX, rotY, rotZ)
     SetCamRot(cam, newRotX, newRotY, newRotZ, 5)
     SetCamFov(cam, fov)
 
+    local Dialog = data
+
+    local function extractEvents(tbl)
+        for k, v in pairs(tbl) do
+            if type(v) == "table" then
+                extractEvents(v)
+            elseif k == "event" and type(v) == "string" then
+                Actions[v] = v
+            end
+        end
+    end
+
+    extractEvents(Dialog)
+
     SetNuiFocus(true, true)
     SendNUIMessage({
         type = 'New',
@@ -61,7 +76,6 @@ CloseDialog = function()
     SendNUIMessage({
         type = 'Close',
     })
-    DestroyCam(cam, true)
 end
 
 SpawnPedByID = function(id, data)
@@ -77,7 +91,7 @@ DeletePedByID = function(id)
     end
 end
 
-RegisterNUICallback('click', function(data, cb)
+RegisterNuiCallback("click", function(data, cb)
     if data.data then
         SendNUIMessage({
             type = 'Continue',
@@ -88,22 +102,27 @@ RegisterNUICallback('click', function(data, cb)
     end
 
     if data.close then
-        Open = false
-        RenderScriptCams(false, true, 500, true, true)
         SetNuiFocus(false, false)
-        cb('close')
+        if cam and DoesCamExist(cam) then
+            RenderScriptCams(false, true, 500, true, true)
+            DestroyCam(cam, true)
+        else
+            print("Camera reference is invalid or destroyed.")
+        end
+        CloseDialog()
     end
 
-    if data.event then
-        local args = data.args or {}
-
+    if Actions[data.event] then
         if data.server then
-            TriggerServerEvent(data.event, args)
+            print("Triggering Server Event:", Actions[data.event])
+            TriggerServerEvent(Actions[data.event], data)
         else
-            TriggerEvent(data.event, args)
+            print("Triggering Client Event:", Actions[data.event])
+            TriggerEvent(Actions[data.event], data)
         end
     end
 end)
+
 exports('OpenDialog', OpenDialog)
 exports('SetDialog', SetDialog)
 exports('CloseDialog', CloseDialog)
