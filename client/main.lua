@@ -106,18 +106,14 @@ RegisterNuiCallback("click", function(data, cb)
         if cam and DoesCamExist(cam) then
             RenderScriptCams(false, true, 500, true, true)
             DestroyCam(cam, true)
-        else
-            print("Camera reference is invalid or destroyed.")
         end
         CloseDialog()
     end
 
     if Actions[data.event] then
         if data.server then
-            print("Triggering Server Event:", Actions[data.event])
             TriggerServerEvent(Actions[data.event], data)
         else
-            print("Triggering Client Event:", Actions[data.event])
             TriggerEvent(Actions[data.event], data)
         end
     end
