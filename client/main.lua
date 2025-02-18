@@ -1,4 +1,5 @@
 Open = false
+cam = nil
 Peds = {}
 
 RegisterNetEvent(Config.FrameworkLoadinEvent, function()
@@ -11,15 +12,32 @@ AddEventHandler('onResourceStart', function(resourceName)
     end
 end)
 
-OpenDialog = function(ped, data)
-    local coords = GetOffsetFromEntityInWorldCoords(ped, 0, 1.5, 0.3)
-    local cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+---@param ped number # The id of the ped
+---@param data table # The data for the interaction
+---@param zoom number # Camera zoom level (optional, default: 40.0)
+---@param x number # Camera X position (optional, default: 0)
+---@param y number # Camera Y position (optional, default: 1.5)
+---@param z number # Camera Z position (optional, default: 0.3)
+---@param rotX number # Camera X rotation (optional, default: 0.0)
+---@param rotY number # Camera Y rotation (optional, default: 0.0)
+---@param rotZ number # Camera Z rotation (optional, default: GetEntityHeading(ped) + 180)
+OpenDialog = function(ped, data, zoom, x, y, z, rotX, rotY, rotZ)
+    -- Setting defaults
+    local newX, newY, newZ = x or 0, y or 1.5, z or 0.3
+    local newRotX, newRotY, newRotZ = rotX or 0.0, rotY or 0.0, rotZ or GetEntityHeading(ped) + 180
+    local fov = zoom or 40.0
+
+    local coords = GetOffsetFromEntityInWorldCoords(ped, newX, newY, newZ)
+
+    -- camera setup
+    cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
     SetEntityLocallyInvisible(PlayerPedId())
     SetCamActive(cam, true)
     RenderScriptCams(true, true, 500, true, true)
     SetCamCoord(cam, coords.x, coords.y, coords.z + 0.2)
-    SetCamRot(cam, 0.0, 0.0, GetEntityHeading(ped) + 180, 5)
-    SetCamFov(cam, 40.0)
+    SetCamRot(cam, newRotX, newRotY, newRotZ, 5)
+    SetCamFov(cam, fov)
+
     SetNuiFocus(true, true)
     SendNUIMessage({
         type = 'New',
@@ -41,14 +59,15 @@ CloseDialog = function()
     SendNUIMessage({
         type = 'Close',
     })
+    DestroyCam(cam, true)
 end
 
-SpawnPedByID = function(id, data) 
+SpawnPedByID = function(id, data)
     Peds[id] = data
     SpawnPed(id, data)
 end
 
-DeletePedByID = function(id) 
+DeletePedByID = function(id)
     if Peds[id].ped then
         exports['qb-target']:RemoveTargetEntity(Peds[id].ped)
         DeleteEntity(Peds[id].ped)

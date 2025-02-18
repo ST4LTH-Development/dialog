@@ -1,4 +1,5 @@
 Config = {
+    Target = 'ox', -- 'ox' , 'qb'
     FrameworkLoadinEvent = 'QBCore:Client:OnPlayerLoaded',
     peds = {
 --[[         ['test'] = {

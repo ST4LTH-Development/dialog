@@ -127,10 +127,17 @@ SpawnPed = function(id, data)
             end
         end
     }
-    exports['qb-target']:AddTargetEntity(Peds[id].ped, {
-        options = { opts },
-        distance = 2.0
-    })
+
+    if Config.Target == 'qb' then
+        exports['qb-target']:AddTargetEntity(Peds[id].ped, {
+            options = { opts },
+            distance = 2.0
+        })
+    elseif Config.Target == 'ox' then
+        exports.ox_target:addLocalEntity(Peds[id].ped, {opts}) -- Use opts directly
+    else
+        print("^1[ERROR] Invalid Target Config! Check your Config.Target setting.^0")
+    end
 end
 
 SetInvisible = function()
