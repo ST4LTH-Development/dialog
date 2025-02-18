@@ -2,13 +2,15 @@ Open = false
 cam = nil
 Peds = {}
 
-RegisterNetEvent(Config.FrameworkLoadinEvent, function()
-    SpawnPeds()
-end)
+if Config.FrameworkLoadinEvent ~= '' then
+    RegisterNetEvent(Config.FrameworkLoadinEvent, function()
+        SpawnPeds()
+    end)
+end
 
 AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() == resourceName) then
-        SpawnPeds()
+        if #Config.peds ~= 0 then SpawnPeds() end
     end
 end)
 
